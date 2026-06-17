@@ -1,12 +1,49 @@
 // src/views/ListaClientes.jsx
-import { useState } from 'react';
-import { Container, Table, Button, Card } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Container, Table, Button, Spinner, Alert, Card } from 'react-bootstrap';
 
 const ListaClientes = () => {
-    // Datos cableados provisorios 
-    const [clientes] = useState([
-        { id: 1, name: { firstname: "John", lastname: "Doe" }, email: "john@mail.com", phone: "123456789", address: { city: "Sanjuan" } }
-    ]);       
+    const navigate = useNavigate();
+    
+    // Estados para manejar la API
+    const [clientes, setClientes] = useState([]);       
+    const [loading, setLoading] = useState(true);        
+    const [error, setError] = useState(null);            
+
+    // Hook para disparar la búsqueda a internet apenas carga la pantalla
+    useEffect(() => {
+        const obtenerClientesRemotos = async () => {
+            try {
+                setLoading(true); 
+                const respuesta = await fetch('https://fakestoreapi.com/users');
+                if (!respuesta.ok) throw new Error('No se pudo conectar con el servidor de FakeStoreAPI');
+                const datosConvertidos = await respuesta.json(); 
+                setClientes(datosConvertidos); 
+            } catch (err) {
+                setError(err.message); 
+            } finally {
+                setLoading(false); 
+            }
+        };
+        obtenerClientesRemotos();
+    }, []); 
+
+    // Renderizados condicionales mientras espera la red o si hay error
+    if (loading) {
+        return (
+            <Container className="text-center mt-5 py-5">
+                <Spinner animation="border" variant="primary" className="mb-2" />
+                <p className="text-secondary fw-bold">Cargando lista de clientes desde la nube...</p>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container className="mt-5"><Alert variant="danger">{error}</Alert></Container>
+        );
+    }
 
     return (
         <Container className="mt-3">
@@ -25,6 +62,7 @@ const ListaClientes = () => {
                         </tr>
                     </thead>
                     <tbody>
+                        {/* Ahora mapeamos los clientes reales que bajaron de la API */}
                         {clientes.map(cliente => (
                             <tr key={cliente.id}>
                                 <td className="fw-bold text-primary">#{cliente.id}</td>
@@ -33,7 +71,7 @@ const ListaClientes = () => {
                                 <td>{cliente.phone}</td>
                                 <td className="text-capitalize">{cliente.address.city}</td>
                                 <td className="text-center">
-                                    <Button variant="outline-primary" size="sm" className="fw-bold">
+                                    <Button variant="outline-primary" size="sm" className="fw-bold" onClick={() => navigate(`/clientes/${cliente.id}`)}>
                                         Ver Ficha Completa
                                     </Button>
                                 </td>
