@@ -1,17 +1,18 @@
 // src/views/ListaClientes.jsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Spinner, Alert, Card } from 'react-bootstrap';
+// Sumamos 'Form' en la importación de react-bootstrap
+import { Container, Table, Button, Spinner, Alert, Card, Form } from 'react-bootstrap';
 
 const ListaClientes = () => {
     const navigate = useNavigate();
     
-    // Estados para manejar la API
     const [clientes, setClientes] = useState([]);       
     const [loading, setLoading] = useState(true);        
     const [error, setError] = useState(null);            
+    // 🌟 NUEVO ESTADO: Para guardar lo que el usuario escribe en el buscador
+    const [busqueda, setBusqueda] = useState('');        
 
-    // Hook para disparar la búsqueda a internet apenas carga la pantalla
     useEffect(() => {
         const obtenerClientesRemotos = async () => {
             try {
@@ -29,7 +30,13 @@ const ListaClientes = () => {
         obtenerClientesRemotos();
     }, []); 
 
-    // Renderizados condicionales mientras espera la red o si hay error
+    // : Filtramos la lista original en tiempo real según lo escrito
+    const clientesFiltrados = clientes.filter(cliente => {
+        const apellido = cliente.name.lastname.toLowerCase();
+        const ciudad = cliente.address.city.toLowerCase();
+        return apellido.includes(busqueda.toLowerCase()) || ciudad.includes(busqueda.toLowerCase());
+    });
+
     if (loading) {
         return (
             <Container className="text-center mt-5 py-5">
@@ -49,6 +56,19 @@ const ListaClientes = () => {
         <Container className="mt-3">
             <h2 className="fw-bold text-dark mb-4">Base General de Clientes</h2>
             
+            {/* 🌟 NUEVO COMPONENTE: La barra de búsqueda arriba de la tabla */}
+            <Card className="shadow-sm border-0 p-3 mb-4 bg-white">
+                <Form.Group>
+                    <Form.Label className="fw-bold text-secondary mb-2">🔍 Buscador de Clientes</Form.Label>
+                    <Form.Control 
+                        type="text" 
+                        placeholder="Filtrar por apellido o por ciudad..." 
+                        value={busqueda} 
+                        onChange={(e) => setBusqueda(e.target.value)} 
+                    />
+                </Form.Group>
+            </Card>
+
             <Card className="shadow-sm border-0 bg-white">
                 <Table responsive hover className="align-middle mb-0">
                     <thead className="table-dark">
@@ -62,8 +82,8 @@ const ListaClientes = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {/* Ahora mapeamos los clientes reales que bajaron de la API */}
-                        {clientes.map(cliente => (
+                        {/* 🌟 CAMBIO CLAVE: Ahora mapeamos 'clientesFiltrados' en lugar de 'clientes' */}
+                        {clientesFiltrados.map(cliente => (
                             <tr key={cliente.id}>
                                 <td className="fw-bold text-primary">#{cliente.id}</td>
                                 <td className="text-capitalize">{cliente.name.firstname} {cliente.name.lastname}</td>
