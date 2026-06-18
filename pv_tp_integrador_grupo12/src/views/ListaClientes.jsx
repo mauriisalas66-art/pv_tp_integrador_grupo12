@@ -36,11 +36,11 @@ const ListaClientes = () => {
         obtenerClientesRemotos();
     }, []); 
 
-    // 🔍 FUNCIÓN VALIDADORA AVANZADA (Filtros típicos exigidos en sistemas reales)
+
     const validarAltaCliente = () => {
-        // Regla para prohibir números (Solo permite letras de la A a la Z y espacios)
+    
         const soloLetrasRegExp = /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/;
-        // Regla para prohibir letras (Solo permite números puros)
+    
         const soloNumerosRegExp = /^[0-9]+$/;
 
         if (!soloLetrasRegExp.test(nuevoCliente.firstname)) {
@@ -58,7 +58,6 @@ const ListaClientes = () => {
             return false;
         }
 
-        // Validamos que el teléfono sean solo números (prohibido meter letras)
         if (!soloNumerosRegExp.test(nuevoCliente.phone)) {
             setErrorModal("⚠️ El campo Teléfono solo acepta números. Quite las letras o espacios.");
             return false;
@@ -155,7 +154,7 @@ const ListaClientes = () => {
                     </Button>
                 ) : (
                     <span className="text-muted small bg-light p-2 rounded border">
-                        👀 Modo Lectura (Soporte)
+                         Modo Lectura (Soporte)
                     </span>
                 )}
             </div>
