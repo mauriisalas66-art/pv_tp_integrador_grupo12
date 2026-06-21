@@ -1,16 +1,18 @@
 // src/context/AdminContext.jsx
-import { createContext, useState, useEffect } from 'react'; 
+import { createContext, useState, useEffect } from 'react';
 
 export const AdminContext = createContext();
 
 export const AdminProvider = ({ children }) => {
-  const [admin, setAdmin] = useState(null);
+  const [admin, setAdmin] = useState(() => {
+    const sesionGuardada = localStorage.getItem('operador_sesion');
+    return sesionGuardada ? JSON.parse(sesionGuardada) : null;
+  });
+
   useEffect(() => {
     if (admin) {
-    
       localStorage.setItem('operador_sesion', JSON.stringify(admin));
     } else {
-    
       localStorage.removeItem('operador_sesion');
     }
   }, [admin]);
@@ -22,6 +24,7 @@ export const AdminProvider = ({ children }) => {
   const logout = () => {
     setAdmin(null);
   };
+
   return (
     <AdminContext.Provider value={{ admin, login, logout }}>
       {children}
