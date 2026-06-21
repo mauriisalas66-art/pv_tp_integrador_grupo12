@@ -2,6 +2,10 @@
 import { useState } from 'react';
 
 export const Login = () => {
+  const [nombre, setNombre] = useState('');
+  const [email, setEmail] = useState(''); 
+  const [sector, setSector] = useState(''); 
+
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
       <h2>Acceso al Sistema - Operador</h2>
@@ -11,17 +15,33 @@ export const Login = () => {
           <input 
             type="text" 
             placeholder="Escribí tu nombre"
+            value={nombre} 
+            onChange={(e) => setNombre(e.target.value)} 
             style={{ width: '100%', padding: '8px' }}
             required
           />
         </div>
 
         <div style={{ marginBottom: '15px' }}>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Correo Electrónico:</label>
+          <input 
+            type="email" 
+            placeholder="ejemplo@correo.com"
+            value={email} 
+            onChange={(e) => setEmail(e.target.value)} 
+            style={{ width: '100%', padding: '8px' }}
+            required
+          />
+        </div>
+
+        {/* Mantenemos temporalmente este input hasta el próximo commit del Select */}
+        <div style={{ marginBottom: '15px' }}>
           <label style={{ display: 'block', marginBottom: '5px' }}>Sector de la Empresa:</label>
-          {/* El selector fino lo agregamos en los próximos commits */}
           <input 
             type="text" 
             placeholder="Sector asignado"
+            value={sector}
+            onChange={(e) => setSector(e.target.value)}
             style={{ width: '100%', padding: '8px' }}
             required
           />
