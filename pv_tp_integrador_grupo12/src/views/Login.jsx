@@ -1,55 +1,32 @@
 // src/views/Login.jsx
-import { useState, useContext } from 'react';
-import { AdminContext } from '../context/AdminContext';
-import { loginService } from '../services/authService';
+import { useState } from 'react';
 
 export const Login = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
-  // CONSUMO DEL CONTEXTO (Commit 11)
-  const { setAdmin } = useContext(AdminContext);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      // Llamamos al servicio con los datos simulados que ya programaste
-      const userData = await loginService(email, password);
-      
-      // Guardamos al operador en el estado global si pasa las validaciones
-      setAdmin(userData);
-      alert("¡Conexión exitosa! Bienvenido " + userData.nombre);
-    } catch (error) {
-      alert(error.message); // Muestra el error de los 8 caracteres si falla
-    }
-  };
-
   return (
     <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
-      <h2>Iniciar Sesión - Operador</h2>
-      <form onSubmit={handleSubmit}>
+      <h2>Acceso al Sistema - Operador</h2>
+      <form>
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Correo Electrónico:</label>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Nombre del Operador:</label>
           <input 
-            type="email" 
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="ejemplo@correo.com"
+            type="text" 
+            placeholder="Escribí tu nombre"
             style={{ width: '100%', padding: '8px' }}
             required
           />
         </div>
+
         <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Contraseña:</label>
+          <label style={{ display: 'block', marginBottom: '5px' }}>Sector de la Empresa:</label>
+          {/* El selector fino lo agregamos en los próximos commits */}
           <input 
-            type="password" 
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Mínimo 8 caracteres"
+            type="text" 
+            placeholder="Sector asignado"
             style={{ width: '100%', padding: '8px' }}
             required
           />
         </div>
+
         <button type="submit" style={{ padding: '10px 15px', cursor: 'pointer' }}>
           Ingresar
         </button>
