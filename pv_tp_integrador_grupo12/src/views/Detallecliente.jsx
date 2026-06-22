@@ -1,9 +1,10 @@
+// src/views/DetalleCliente.jsx
 import { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Container, Card, Button, Row, Col, Spinner, Alert } from 'react-bootstrap';
 import { AdminContext } from '../context/AdminContext';
 
-export const DetalleCliente = () => {
+const DetalleCliente = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { admin } = useContext(AdminContext);
@@ -48,7 +49,7 @@ export const DetalleCliente = () => {
         throw new Error('Error al intentar eliminar el cliente');
       }
 
-      alert('Cliente eliminado con éxito (Simulado).');
+      alert('¡Cliente dado de baja exitosamente del sistema!');
       navigate('/clientes');
     } catch (err) {
       alert(err.message);
@@ -84,7 +85,7 @@ export const DetalleCliente = () => {
         </Button>
       </div>
 
-      {admin?.sector === 'Soporte' && (
+      {admin?.rol === 'Soporte' && (
         <Alert variant="info" className="mb-4">
           ℹ️ <strong>Modo Lectura:</strong> Tu perfil de Soporte solo permite visualizar los datos.
         </Alert>
@@ -131,7 +132,7 @@ export const DetalleCliente = () => {
         </Col>
       </Row>
 
-      {admin?.sector === 'Gerencia' && (
+      {admin?.rol === 'Gerencia' && (
         <div className="d-flex justify-content-end mt-2">
           <Button 
             variant="danger" 
@@ -145,3 +146,5 @@ export const DetalleCliente = () => {
     </Container>
   );
 };
+
+export default DetalleCliente;

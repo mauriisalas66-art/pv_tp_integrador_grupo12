@@ -5,16 +5,12 @@ import { useNavigate } from 'react-router-dom';
 import { AdminContext } from '../context/AdminContext';
 
 const Dashboard = () => {
-  const { admin, cerrarSesion } = useContext(AdminContext);
+  const { admin } = useContext(AdminContext);
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    cerrarSesion();
-    navigate('/');
-  };
 
   return (
     <Container className="mt-5">
+      {/* Cabecera limpia solo con los datos */}
       <div className="d-flex justify-content-between align-items-center mb-4 bg-light p-3 rounded shadow-sm">
         <div>
           <h2 className="fw-bold mb-0 text-dark">Panel de Control</h2>
@@ -22,9 +18,6 @@ const Dashboard = () => {
             Bienvenido: <strong>{admin?.nombre}</strong> | Sector: <span className="badge bg-primary">{admin?.rol}</span>
           </small>
         </div>
-        <Button variant="outline-danger" size="sm" onClick={handleLogout}>
-          Cerrar Sesión
-        </Button>
       </div>
 
       <Row className="g-4">
@@ -58,4 +51,5 @@ const Dashboard = () => {
     </Container>
   );
 };
+
 export default Dashboard;

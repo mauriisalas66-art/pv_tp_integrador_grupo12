@@ -1,6 +1,5 @@
-import { createBrowserRouter } from 'react-router-dom';
-import { Navigate } from 'react-router-dom';
-import App from '../App'; 
+import { createBrowserRouter, Navigate } from 'react-router-dom';
+import LayoutPrincipal from '../components/layout/LayoutPrincipal'; 
 import Login from '../views/Login';
 import Dashboard from '../views/Dashboard';
 import ListaClientes from '../views/ListaClientes';
@@ -10,7 +9,7 @@ import RutaProtegida from './RutaProtegida';
 export const AppRouter = createBrowserRouter([
   {
     path: '/',
-    element: <App />, 
+    element: <LayoutPrincipal />, 
     children: [
       {
         index: true, 

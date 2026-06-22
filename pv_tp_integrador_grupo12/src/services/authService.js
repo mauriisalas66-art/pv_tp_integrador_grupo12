@@ -1,22 +1,45 @@
 // src/services/authService.js
 
-export const loginService = async (email, password) => {
-  if (!password || password.length < 8) {
-    throw new Error("La contraseña debe tener al menos 8 caracteres.");
-  }
-  if (!email || !email.includes("@")) {
-    throw new Error("Por favor, ingrese un correo electrónico válido.");
-  }
+export const authService = (() => {
+  const administradores = [
+    { 
+      id: 1, 
+      user: "jairo@mail.com", 
+      password: "12345678",    
+      nombre: "Jairo Almazán", 
+      rol: "Gerencia" 
+    },
+    { 
+      id: 2, 
+      user: "cami@mail.com", 
+      password: "12345678",    
+      nombre: "Camila Mansilla", 
+      rol: "Soporte" 
+    },
+    { 
+      id: 3, 
+      user: "ale@mail.com", 
+      password: "12345678",    
+      nombre: "Alessandro Nieves", 
+      rol: "Soporte"
+    }
+  ];
 
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      
-      resolve({
-        nombre: "Admin temporal", 
-        email: email,
-        token: "fake-jwt-token-grupo12",
-        status: "success"
-      });
-    }, 1500); 
-  });
-};
+  const login = (user, password, sector) => {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const encontrado = administradores.find(
+          (admin) => admin.user === user && admin.password === password && admin.rol === sector
+        );
+
+        if (encontrado) {
+          resolve({ nombre: encontrado.nombre, rol: encontrado.rol });
+        } else {
+          reject(new Error("Credenciales incorrectas o sector equivocado"));
+        }
+      }, 800); 
+    });
+  };
+
+  return { login };
+})();

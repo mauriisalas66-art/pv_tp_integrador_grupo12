@@ -119,7 +119,6 @@ const ListaClientes = () => {
                 </Table>
             </Card>
 
-            {/* 🌟 EL TIKI-TAKA MODULAR: Invocamos el formulario externo */}
             <FormCliente 
                 show={showModal} 
                 onHide={() => setShowModal(false)} 
