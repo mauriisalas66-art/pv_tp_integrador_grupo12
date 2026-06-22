@@ -1,6 +1,7 @@
+// src/router/RutaProtegida.jsx
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AdminContext } from "../context/AdminContext"; // <-- Subimos un nivel con "../"
+import { AdminContext } from "../context/AdminContext";
 
 const RutaProtegida = ({ children }) => {
   const { admin } = useContext(AdminContext);

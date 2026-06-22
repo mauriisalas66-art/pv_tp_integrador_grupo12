@@ -1,93 +1,127 @@
 // src/views/Login.jsx
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Container, Card, Form, Button, Alert, Spinner, Toast, ToastContainer, Row, Col } from 'react-bootstrap';
 import { AdminContext } from '../context/AdminContext';
+import { authService } from '../services/authService';
 
-export const Login = () => {
-  const [nombre, setNombre] = useState('');
+const Login = () => {
+
+  const { admin, login } = useContext(AdminContext);
+  const navigate = useNavigate();
+
+
+  useEffect(() => {
+    if (admin) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [admin, navigate]);
+
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [sector, setSector] = useState('');
   
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [mostrarToast, setMostrarToast] = useState(false);
+  const [nombreOperador, setNombreOperador] = useState('');
 
-  const { login } = useContext(AdminContext);
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
 
-    const datosOperador = { nombre, email, sector };
-    login(datosOperador);
+    if (!email.includes('@')) {
+      setError("⚠️ Por favor, ingrese un correo electrónico válido.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("⚠️ La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
 
-    setMostrarToast(true);
+    setLoading(true);
 
-    setTimeout(() => {
-      setMostrarToast(false);
-    }, 3000);
+    try {
+      const adminLogueado = await authService.login(email, password, sector);
+      
+      setNombreOperador(adminLogueado.nombre);
+      setMostrarToast(true);
+      
+      login(adminLogueado);
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1200);
+
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
   };
 
+  if (admin) return null;
+
   return (
-    <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto', position: 'relative' }}>
-      <h2>Acceso al Sistema - Operador</h2>
-      
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Nombre del Operador:</label>
-          <input 
-            type="text" 
-            placeholder="Escribí tu nombre"
-            value={nombre}
-            onChange={(e) => setNombre(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-            required
-          />
-        </div>
+    <Container className="mt-5" style={{ minHeight: '80vh' }}>
+      <Row className="justify-content-center">
+        <Col md={5}>
+          <Card className="shadow border-0 bg-white p-3">
+            <Card.Body>
+              <h3 className="text-center fw-bold text-primary mb-4">Acceso al Sistema</h3>
+              
+              {error && <Alert variant="danger" className="py-2 text-center small fw-bold">{error}</Alert>}
+              
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-bold text-secondary">Correo Electrónico</Form.Label>
+                  <Form.Control 
+                    type="email" 
+                    placeholder="ejemplo@correo.com" 
+                    value={email} 
+                    onChange={(e) => setEmail(e.target.value)} 
+                    required 
+                  />
+                </Form.Group>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Correo Electrónico:</label>
-          <input 
-            type="email" 
-            placeholder="ejemplo@correo.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: '100%', padding: '8px' }}
-            required
-          />
-        </div>
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-bold text-secondary">Contraseña</Form.Label>
+                  <Form.Control 
+                    type="password" 
+                    placeholder="Mínimo 8 caracteres" 
+                    value={password} 
+                    onChange={(e) => setPassword(e.target.value)} 
+                    required 
+                  />
+                </Form.Group>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', marginBottom: '5px' }}>Sector de la Empresa:</label>
-          <select
-            value={sector}
-            onChange={(e) => setSector(e.target.value)}
-            style={{ width: '100%', padding: '8px', cursor: 'pointer' }}
-            required
-          >
-            <option value="" disabled>-- Seleccione un Sector --</option>
-            <option value="Soporte">Soporte</option>
-            <option value="Gerencia">Gerencia</option>
-          </select>
-        </div>
+                <Form.Group className="mb-4">
+                  <Form.Label className="fw-bold text-secondary">Sector de la Empresa</Form.Label>
+                  <Form.Select value={sector} onChange={(e) => setSector(e.target.value)} required>
+                    <option value="" disabled>-- Seleccione un Sector --</option>
+                    <option value="Soporte">Soporte</option>
+                    <option value="Gerencia">Gerencia</option>
+                  </Form.Select>
+                </Form.Group>
 
-        <button type="submit" style={{ padding: '10px 15px', cursor: 'pointer' }}>
-          Ingresar
-        </button>
-      </form>
+                <Button variant="primary" type="submit" className="w-100 py-2 fw-bold shadow-sm" disabled={loading}>
+                  {loading ? <Spinner animation="border" size="sm" /> : 'Ingresar al Sistema'}
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row>
 
-      {mostrarToast && (
-        <div style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '20px',
-          backgroundColor: '#1c1c1c',
-          color: '#ffffff',
-          padding: '12px 24px',
-          borderRadius: '6px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-          zIndex: 1000,
-          animation: 'fadeIn 0.3s ease'
-        }}>
-          ¡Bienvenido, operador <strong>{nombre}</strong>! Conexión exitosa.
-        </div>
-      )}
-    </div>
+      <ToastContainer position="bottom-end" className="p-3" style={{ position: 'fixed', zIndex: 9999 }}>
+        <Toast bg="dark" show={mostrarToast} onClose={() => setMostrarToast(false)} delay={2500} autohide animation={true}>
+          <Toast.Body className="text-white small d-flex justify-content-between align-items-center py-2 px-3">
+            <span>👋 ¡Hola! Ingreso correcto de <strong>{nombreOperador}</strong>.</span>
+            <Button variant="close" className="btn-close-white ms-3" onClick={() => setMostrarToast(false)} />
+          </Toast.Body>
+        </Toast>
+      </ToastContainer>
+    </Container>
   );
 };
+
+export default Login;

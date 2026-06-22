@@ -69,7 +69,6 @@ const FormCliente = ({ show, onHide, onAltaExitosa }) => {
             if (!respuesta.ok) throw new Error('No se pudo registrar en la nube');
             const resultado = await respuesta.json(); 
 
-            // Avisamos al componente padre que todo salió bien y le pasamos el ID asignado
             onAltaExitosa(resultado.id);
             setNuevoCliente({ firstname: '', lastname: '', email: '', phone: '', city: '', password: '' }); 
         } catch (err) {
