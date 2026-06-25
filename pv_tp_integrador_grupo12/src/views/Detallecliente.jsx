@@ -13,6 +13,8 @@ const DetalleCliente = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [eliminando, setEliminando] = useState(false);
+  // Nuevo estado para la notificación visual roja de éxito en la baja
+  const [alertaBajaExitosa, setAlertaBajaExitosa] = useState(null);
 
   useEffect(() => {
     const obtenerCliente = async () => {
@@ -49,11 +51,16 @@ const DetalleCliente = () => {
         throw new Error('Error al intentar eliminar el cliente');
       }
 
-      alert('¡Cliente dado de baja exitosamente del sistema!');
-      navigate('/clientes');
+      // Activamos el cartel dinámico en pantalla
+      setAlertaBajaExitosa(`🗑️ ¡Cliente #${id} dado de baja exitosamente del sistema!`);
+      
+      // Esperamos 1.5 segundos para que el operador lo lea, y redirigimos
+      setTimeout(() => {
+        navigate('/clientes');
+      }, 1500);
+
     } catch (err) {
       alert(err.message);
-    } finally {
       setEliminando(false);
     }
   };
@@ -78,6 +85,13 @@ const DetalleCliente = () => {
 
   return (
     <Container className="my-4">
+      {/* Si el estado tiene texto, mostramos la alerta roja/anaranjada de Bootstrap */}
+      {alertaBajaExitosa && (
+        <Alert variant="danger" className="text-center fw-bold shadow border-0 mb-4 animate__animated animate__fadeIn">
+          {alertaBajaExitosa}
+        </Alert>
+      )}
+
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2>Ficha Profunda del Cliente #{id}</h2>
         <Button as={Link} to="/clientes" variant="secondary" size="sm">
@@ -137,7 +151,7 @@ const DetalleCliente = () => {
           <Button 
             variant="danger" 
             onClick={handleEliminar} 
-            disabled={eliminando}
+            disabled={eliminando || alertaBajaExitosa}
           >
             {eliminando ? 'Eliminando...' : '❌ Dar de Baja Cliente'}
           </Button>

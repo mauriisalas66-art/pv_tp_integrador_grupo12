@@ -3,7 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Table, Button, Form, Spinner, Alert, Card } from 'react-bootstrap';
 import { AdminContext } from '../context/AdminContext';
-import FormCliente from '../components/common/FormCliente'; // <-- Importamos el formulario extraído
+import FormCliente from '../components/common/FormCliente';
 
 const ListaClientes = () => {
     const navigate = useNavigate();
@@ -42,10 +42,17 @@ const ListaClientes = () => {
         setTimeout(() => setAlertaExito(null), 4000);
     };
 
+    // NUEVO BUSCADOR MEJORADO: Filtra concurrentemente por Nombre, Apellido o Ciudad
     const clientesFiltrados = clientes.filter(cliente => {
+        const nombre = cliente.name.firstname.toLowerCase();
         const apellido = cliente.name.lastname.toLowerCase();
-        const city = cliente.address.city.toLowerCase();
-        return apellido.includes(busqueda.toLowerCase()) || city.includes(busqueda.toLowerCase());
+        const ciudad = cliente.address.city.toLowerCase();
+        const terminoBusqueda = busqueda.toLowerCase();
+
+        // Si el término coincide con cualquiera de los tres campos usando el operador OR (||)
+        return nombre.includes(terminoBusqueda) || 
+               apellido.includes(terminoBusqueda) || 
+               ciudad.includes(terminoBusqueda);
     });
 
     if (loading) {
@@ -84,7 +91,7 @@ const ListaClientes = () => {
             <Card className="shadow-sm border-0 p-3 mb-4 bg-white">
                 <Form.Group>
                     <Form.Label className="fw-bold text-secondary mb-2">🔍 Buscador de Clientes</Form.Label>
-                    <Form.Control type="text" placeholder="Filtrar por apellido o por ciudad..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                    <Form.Control type="text" placeholder="Filtrar por nombre, apellido o por ciudad..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
                 </Form.Group>
             </Card>
 
