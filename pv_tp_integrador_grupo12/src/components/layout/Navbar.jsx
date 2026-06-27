@@ -1,11 +1,13 @@
 // src/components/layout/Navbar.jsx
-import { useContext } from 'react';
 import { Navbar as BootNavbar, Container, Nav, Button } from 'react-bootstrap';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { AdminContext } from '../../context/AdminContext';
+import { useAdmin } from '../../hooks/useAdmin'; // <-- Importa tu gancho independiente
 
 const Navbar = () => {
-  const { admin, logout } = useContext(AdminContext);
+  // 🔥 ¡REEMPLAZADO! Ya no usa useContext(AdminContext). 
+  // Ahora llama directo a tu hook independiente.
+  const { admin, logout } = useAdmin(); 
+  
   const navigate = useNavigate();
   const location = useLocation(); 
 

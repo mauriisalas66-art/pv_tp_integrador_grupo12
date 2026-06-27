@@ -1,65 +1,32 @@
 // src/views/ListaClientes.jsx
-import { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Container, Table, Button, Form, Spinner, Alert, Card } from 'react-bootstrap';
-import { AdminContext } from '../context/AdminContext';
-import FormCliente from '../components/common/FormCliente';
+import { useNavigate } from "react-router-dom";
+import { Container, Table, Button, Form, Spinner, Alert, Card } from "react-bootstrap";
+import { useAdmin } from "../hooks/useAdmin"; 
+import { useClientes } from "../hooks/useClientes";
+import FormCliente from "../components/common/FormCliente";
 
 const ListaClientes = () => {
     const navigate = useNavigate();
-    const { admin } = useContext(AdminContext);
+    const { admin } = useAdmin();
 
-    const [clientes, setClientes] = useState([]);       
-    const [loading, setLoading] = useState(true);        
-    const [error, setError] = useState(null);            
-    const [busqueda, setBusqueda] = useState('');        
-
-    // Control de visibilidad del modal y alerta de éxito general
-    const [showModal, setShowModal] = useState(false); 
-    const [alertaExito, setAlertaExito] = useState(null);
-
-    useEffect(() => {
-        const obtenerClientesRemotos = async () => {
-            try {
-                setLoading(true); 
-                const respuesta = await fetch('https://fakestoreapi.com/users');
-                if (!respuesta.ok) throw new Error('No se pudo conectar con el servidor');
-                const datosConvertidos = await respuesta.json(); 
-                setClientes(datosConvertidos); 
-            } catch (err) {
-                setError(err.message); 
-            } finally {
-                setLoading(false); 
-            }
-        };
-        obtenerClientesRemotos();
-    }, []); 
-
-    // Esta función se ejecuta cuando el hijo (FormCliente) termina el POST con éxito
-    const manejarAltaExitosa = (idAsignado) => {
-        setShowModal(false);
-        setAlertaExito(`¡Cliente registrado con éxito! ID asignado: #${idAsignado}`);
-        setTimeout(() => setAlertaExito(null), 4000);
-    };
-
-    // NUEVO BUSCADOR MEJORADO: Filtra concurrentemente por Nombre, Apellido o Ciudad
-    const clientesFiltrados = clientes.filter(cliente => {
-        const nombre = cliente.name.firstname.toLowerCase();
-        const apellido = cliente.name.lastname.toLowerCase();
-        const ciudad = cliente.address.city.toLowerCase();
-        const terminoBusqueda = busqueda.toLowerCase();
-
-        // Si el término coincide con cualquiera de los tres campos usando el operador OR (||)
-        return nombre.includes(terminoBusqueda) || 
-               apellido.includes(terminoBusqueda) || 
-               ciudad.includes(terminoBusqueda);
-    });
+    // 🔌 Consumimos el estado ya procesado y masticado
+    const {
+        clientesFiltrados,
+        loading,
+        error,
+        busqueda,
+        setBusqueda,
+        showModal,
+        setShowModal,
+        alertaExito,
+        manejarAltaExitosa
+    } = useClientes();
 
     if (loading) {
         return (
             <Container className="text-center mt-5 py-5">
                 <Spinner animation="border" variant="primary" className="mb-2" />
-                <p className="text-secondary fw-bold">Cargando lista de clientes desde la nube...</p>
+                <p className="text-secondary fw-bold">Cargando lista de clientes...</p>
             </Container>
         );
     }
@@ -91,7 +58,12 @@ const ListaClientes = () => {
             <Card className="shadow-sm border-0 p-3 mb-4 bg-white">
                 <Form.Group>
                     <Form.Label className="fw-bold text-secondary mb-2">🔍 Buscador de Clientes</Form.Label>
-                    <Form.Control type="text" placeholder="Filtrar por nombre, apellido o por ciudad..." value={busqueda} onChange={(e) => setBusqueda(e.target.value)} />
+                    <Form.Control 
+                        type="text" 
+                        placeholder="Filtrar por nombre, apellido o por ciudad..." 
+                        value={busqueda} 
+                        onChange={(e) => setBusqueda(e.target.value)} 
+                    />
                 </Form.Group>
             </Card>
 
@@ -111,10 +83,10 @@ const ListaClientes = () => {
                         {clientesFiltrados.map(cliente => (
                             <tr key={cliente.id}>
                                 <td className="fw-bold text-primary">#{cliente.id}</td>
-                                <td className="text-capitalize">{cliente.name.firstname} {cliente.name.lastname}</td>
+                                <td className="text-capitalize">{cliente?.name?.firstname} {cliente?.name?.lastname}</td>
                                 <td>{cliente.email}</td>
                                 <td>{cliente.phone}</td>
-                                <td className="text-capitalize">{cliente.address.city}</td>
+                                <td className="text-capitalize">{cliente?.address?.city}</td>
                                 <td className="text-center">
                                     <Button variant="outline-primary" size="sm" className="fw-bold" onClick={() => navigate(`/clientes/${cliente.id}`)}>
                                         Ver Ficha Completa
@@ -129,7 +101,7 @@ const ListaClientes = () => {
             <FormCliente 
                 show={showModal} 
                 onHide={() => setShowModal(false)} 
-                onAltaExitosa={manejarAltaExitosa} 
+                onAltaExitosa={(idAsignado, datosFormulario) => manejarAltaExitosa(idAsignado, datosFormulario)} 
             />
         </Container>
     );

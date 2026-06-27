@@ -1,3 +1,4 @@
+// src/components/layout/Footer.jsx
 import { Container } from 'react-bootstrap';
 
 const Footer = () => {

@@ -1,10 +1,10 @@
 // src/router/RutaProtegida.jsx
-import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { AdminContext } from "../context/AdminContext";
+import { useAdmin } from "../hooks/useAdmin"; // <-- Ahora apunta directo a tu carpeta de ganchos
 
 const RutaProtegida = ({ children }) => {
-  const { admin } = useContext(AdminContext);
+  // 🔥 ¡REEMPLAZADO! Ya no depende de useContext ni de AdminContext.
+  const { admin } = useAdmin();
 
   if (!admin) {
     return <Navigate to="/" replace />;

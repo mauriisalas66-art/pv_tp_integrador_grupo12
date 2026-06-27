@@ -1,3 +1,4 @@
+// src/router/AppRouter.jsx
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import LayoutPrincipal from '../components/layout/LayoutPrincipal'; 
 import Login from '../views/Login';

@@ -1,11 +1,11 @@
 // src/views/Dashboard.jsx
-import { useContext } from 'react';
 import { Card, Container, Row, Col, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
-import { AdminContext } from '../context/AdminContext';
+import { useAdmin } from '../hooks/useAdmin'; // <-- Ahora apunta directo a tu carpeta de ganchos independientes
 
 const Dashboard = () => {
-  const { admin } = useContext(AdminContext);
+  // 🔥 ¡REEMPLAZADO! Ya no usa useContext(AdminContext) ni necesita importar 'react'
+  const { admin } = useAdmin();
   const navigate = useNavigate();
 
   return (

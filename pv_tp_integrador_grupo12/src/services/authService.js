@@ -25,17 +25,20 @@ export const authService = (() => {
     }
   ];
 
-  const login = (user, password, sector) => {
+  // Ya no recibe el parámetro "sector"
+  const login = (user, password) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
+        // Busca al administrador que coincida estrictamente con el mail y la contraseña ingresados
         const encontrado = administradores.find(
-          (admin) => admin.user === user && admin.password === password && admin.rol === sector
+          (admin) => admin.user === user && admin.password === password
         );
 
         if (encontrado) {
+          // El servicio lee y despacha automáticamente el rol guardado en la base
           resolve({ nombre: encontrado.nombre, rol: encontrado.rol });
         } else {
-          reject(new Error("Credenciales incorrectas o sector equivocado"));
+          reject(new Error("Credenciales incorrectas. Verifique usuario y contraseña."));
         }
       }, 800); 
     });
