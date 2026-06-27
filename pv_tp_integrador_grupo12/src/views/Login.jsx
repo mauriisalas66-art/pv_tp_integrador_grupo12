@@ -1,15 +1,13 @@
 // src/views/Login.jsx
-import { useState, useContext, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Container, Card, Form, Button, Alert, Spinner, Toast, ToastContainer, Row, Col } from 'react-bootstrap';
-import { AdminContext } from '../context/AdminContext';
+import { useAdmin } from '../hooks/useAdmin';
 import { authService } from '../services/authService';
 
 const Login = () => {
-
-  const { admin, login } = useContext(AdminContext);
+  const { admin, login } = useAdmin();
   const navigate = useNavigate();
-
 
   useEffect(() => {
     if (admin) {
@@ -19,7 +17,6 @@ const Login = () => {
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [sector, setSector] = useState('');
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -30,8 +27,17 @@ const Login = () => {
     e.preventDefault();
     setError(null);
 
+    // Validaciones controladas por JavaScript
+    if (!email || email.trim() === '') {
+      setError("⚠️ El correo electrónico es obligatorio.");
+      return;
+    }
     if (!email.includes('@')) {
       setError("⚠️ Por favor, ingrese un correo electrónico válido.");
+      return;
+    }
+    if (!password || password.trim() === '') {
+      setError("⚠️ La contraseña es obligatoria.");
       return;
     }
     if (password.length < 8) {
@@ -42,7 +48,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const adminLogueado = await authService.login(email, password, sector);
+      // Llamamos al servicio pasando únicamente las dos credenciales básicas
+      const adminLogueado = await authService.login(email, password);
       
       setNombreOperador(adminLogueado.nombre);
       setMostrarToast(true);
@@ -75,32 +82,21 @@ const Login = () => {
                 <Form.Group className="mb-3">
                   <Form.Label className="fw-bold text-secondary">Correo Electrónico</Form.Label>
                   <Form.Control 
-                    type="email" 
+                    type="text" 
                     placeholder="ejemplo@correo.com" 
                     value={email} 
                     onChange={(e) => setEmail(e.target.value)} 
-                    required 
                   />
                 </Form.Group>
 
-                <Form.Group className="mb-3">
+                <Form.Group className="mb-4">
                   <Form.Label className="fw-bold text-secondary">Contraseña</Form.Label>
                   <Form.Control 
                     type="password" 
                     placeholder="Mínimo 8 caracteres" 
                     value={password} 
                     onChange={(e) => setPassword(e.target.value)} 
-                    required 
                   />
-                </Form.Group>
-
-                <Form.Group className="mb-4">
-                  <Form.Label className="fw-bold text-secondary">Sector de la Empresa</Form.Label>
-                  <Form.Select value={sector} onChange={(e) => setSector(e.target.value)} required>
-                    <option value="" disabled>-- Seleccione un Sector --</option>
-                    <option value="Soporte">Soporte</option>
-                    <option value="Gerencia">Gerencia</option>
-                  </Form.Select>
                 </Form.Group>
 
                 <Button variant="primary" type="submit" className="w-100 py-2 fw-bold shadow-sm" disabled={loading}>

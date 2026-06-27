@@ -1,69 +1,22 @@
 // src/views/DetalleCliente.jsx
-import { useEffect, useState, useContext } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Container, Card, Button, Row, Col, Spinner, Alert } from 'react-bootstrap';
-import { AdminContext } from '../context/AdminContext';
+import { useAdmin } from '../hooks/useAdmin';
+import { useDetalleCliente } from '../hooks/useDetalleCliente'; 
 
 const DetalleCliente = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const { admin } = useContext(AdminContext);
+  const { admin } = useAdmin(); 
 
-  const [cliente, setCliente] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [eliminando, setEliminando] = useState(false);
-  // Nuevo estado para la notificación visual roja de éxito en la baja
-  const [alertaBajaExitosa, setAlertaBajaExitosa] = useState(null);
-
-  useEffect(() => {
-    const obtenerCliente = async () => {
-      try {
-        setLoading(true);
-        const respuesta = await fetch(`https://fakestoreapi.com/users/${id}`);
-        
-        if (!respuesta.ok) {
-          throw new Error('No se pudo obtener la información del cliente');
-        }
-        
-        const datos = await respuesta.json();
-        setCliente(datos);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    obtenerCliente();
-  }, [id]);
-
-  const handleEliminar = async () => {
-    if (!window.confirm('¿Está seguro de que desea eliminar este cliente?')) return;
-
-    try {
-      setEliminando(true);
-      const respuesta = await fetch(`https://fakestoreapi.com/users/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!respuesta.ok) {
-        throw new Error('Error al intentar eliminar el cliente');
-      }
-
-      // Activamos el cartel dinámico en pantalla
-      setAlertaBajaExitosa(`🗑️ ¡Cliente #${id} dado de baja exitosamente del sistema!`);
-      
-      // Esperamos 1.5 segundos para que el operador lo lea, y redirigimos
-      setTimeout(() => {
-        navigate('/clientes');
-      }, 1500);
-
-    } catch (err) {
-      alert(err.message);
-      setEliminando(false);
-    }
-  };
+  
+  const {
+    id,
+    cliente,
+    loading,
+    error,
+    eliminando,
+    alertaBajaExitosa,
+    handleEliminar
+  } = useDetalleCliente();
 
   if (loading) {
     return (
@@ -85,7 +38,6 @@ const DetalleCliente = () => {
 
   return (
     <Container className="my-4">
-      {/* Si el estado tiene texto, mostramos la alerta roja/anaranjada de Bootstrap */}
       {alertaBajaExitosa && (
         <Alert variant="danger" className="text-center fw-bold shadow border-0 mb-4 animate__animated animate__fadeIn">
           {alertaBajaExitosa}
@@ -121,8 +73,8 @@ const DetalleCliente = () => {
           <Card className="h-100 shadow-sm">
             <Card.Body>
               <Card.Title className="text-primary border-bottom pb-2">Credenciales de Acceso</Card.Title>
-              <p className="my-2"><strong>Usuario:</strong> {cliente?.username}</p>
-              <p className="my-2"><strong>Contraseña:</strong> <code className="text-dark">{cliente?.password}</code></p>
+              <p className="my-2"><strong>Usuario:</strong> {cliente?.username || 'No registrado'}</p>
+              <p className="my-2"><strong>Contraseña:</strong> <code className="text-dark">{cliente?.password || '••••••••'}</code></p>
             </Card.Body>
           </Card>
         </Col>
@@ -133,12 +85,12 @@ const DetalleCliente = () => {
               <Card.Title className="text-primary border-bottom pb-2">Dirección Completa</Card.Title>
               <Row>
                 <Col sm={6}>
-                  <p className="my-2"><strong>Calle:</strong> {cliente?.address?.street} N° {cliente?.address?.number}</p>
+                  <p className="my-2"><strong>Calle:</strong> {cliente?.address?.street || 'Calle Falsa'} N° {cliente?.address?.number || '123'}</p>
                   <p className="my-2"><strong>Ciudad:</strong> {cliente?.address?.city}</p>
                 </Col>
                 <Col sm={6}>
-                  <p className="my-2"><strong>Código Postal:</strong> {cliente?.address?.zipcode}</p>
-                  <p className="my-2"><strong>Geolocalización:</strong> Lat: {cliente?.address?.geolocation?.lat} | Long: {cliente?.address?.geolocation?.long}</p>
+                  <p className="my-2"><strong>Código Postal:</strong> {cliente?.address?.zipcode || '4600'}</p>
+                  <p className="my-2"><strong>Geolocalización:</strong> Lat: {cliente?.address?.geolocation?.lat || '0'} | Long: {cliente?.address?.geolocation?.long || '0'}</p>
                 </Col>
               </Row>
             </Card.Body>
